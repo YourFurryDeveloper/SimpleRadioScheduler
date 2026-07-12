@@ -3,9 +3,9 @@
 Made as a quick, simple, and free way to get your radio station on air with features such as interval signals! (Gotta have those to make the station sound official! :3)
 
 ### Table of contents
-[Getting started](#getting_started)
+[Getting started](#getting-started)
 <br>
-[More info](#more_info)
+[More info](#more-info)
 
 <br>
 
