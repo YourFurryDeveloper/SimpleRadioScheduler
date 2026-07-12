@@ -33,5 +33,11 @@ To specify the amount of songs that are played before your station's interval si
 
 <br>
 
+To run it, just run `pip install -r requirements.txt` and then `python3 main.py`.
+<br>
+Happy broadcasting! :3
+
+<br>
+
 ## More info
 Whenever you update the configuration file while the program is running, your changes take effect when the next song starts playing.
