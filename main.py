@@ -7,7 +7,6 @@ import os
 import random
 import time
 from datetime import datetime
-import sounddevice as sd
 
 global config
 global musicPaths
@@ -38,77 +37,56 @@ else:
 #device_id = int(input("Select audio device > "))
 #sd.default.device = device_id
 
-player = Playback()
-
-print("=| SimpleRadioScheduler by Mr_McTech/McTechDev AKA YourFurryDeveloper on GitHub :3 |=")
-
 updateConfig()
-print("\nCONFIGURATION")
-print("================================================")
-for setting in range(len(config)):
-    curSetting = list(config)[setting]
-    print(f"{list(config)[setting]}: {config[curSetting]}")
-print("================================================\n")
-print("Config loaded and updated. Config can be updated during playback, and will take effect once the next audio starts.\nStarting song rotation.\n")
 
-time.sleep(2)
+global player
+player = Playback()
 
 playedSongs = []
 numPlayedSongs = songsBeforeInterval
 totalSongsPlayed = 0
 curMusicPath = ""
-while True:
-    updateConfig()
-    
-    if numPlayedSongs == songsBeforeInterval:
-        songList = os.listdir(intervalsPath)
-        supportedFormats = [".mp3", ".wav", ".flac", ".ogg"]
-        songList = [s for s in songList if str(os.path.splitext(s)[1]).lower() in supportedFormats]
-        
-        curSong = random.choice(songList)
-        while curSong in playedSongs:
-            curSong = random.choice(songList)
-        
-        print(f"Current interval signal file: {curSong}")
-        player.load_file(intervalsPath + curSong)
-        total_time = time.strftime('%H:%M:%S', time.gmtime(player.duration))
-        player.play()
-        
-        while player.active:
-            curSongTime = time.strftime('%H:%M:%S', time.gmtime(player.curr_pos))
-            print(f"\033[K[{curSongTime}/{total_time}]", end="\r", flush=True)
-    numPlayedSongs = 0
-    time.sleep(pauseTimeSecs)
-    
-    for c in range(len(musicPaths)):
-        c = len(musicPaths) - (c + 1)
+
+playedIntervals = []
+totalIntervalsPlayed = 0
+curIntervalPath = ""
+
+def playRandomFile(audioFilePaths, totalFilesPlayed, playedFiles, curFilePath):
+    global player
+
+    for c in range(len(audioFilePaths)):
+        #c = len(audioFilePaths) - (c + 1)
+        audioFilePathsList = list(audioFilePaths)
+        audioFilePathsList.reverse()
         
         curTime = datetime.now().time()
-        categoryTime = list(musicPaths)[c]
+        #categoryTime = list(audioFilePaths)[c]
+        categoryTime = audioFilePathsList[c]
         categoryTime = datetime.strptime(categoryTime, "%H:%M").time()
         
-        musicPath = musicPaths[list(musicPaths)[c]]
-        if curTime >= categoryTime and not musicPath == curMusicPath:
-            print(f"\nSwitching music source to {musicPath} (Scheduled for {list(musicPaths)[c]})\n")
-            curMusicPath = musicPath
-            playedSongs = []
-            break
-        else:
+        musicPath = audioFilePaths[audioFilePathsList[c]]
+        if curTime >= categoryTime and not musicPath == curFilePath:
+            print(f"\nSwitching audio source to {musicPath} (Scheduled for {audioFilePathsList[c]})\n")
+            curFilePath = musicPath
+            playedFiles = []
             break
     
     songList = os.listdir(musicPath)
     supportedFormats = [".mp3", ".wav", ".flac", ".ogg"]
     songList = [s for s in songList if str(os.path.splitext(s)[1]).lower() in supportedFormats]
     
-    if totalSongsPlayed == len(songList):
-        playedSongs = []
+    if len(playedFiles) == len(songList):
+        playedFiles = []
+        totalFilesPlayed = 0
+    else:
+        totalFilesPlayed += 1
     
     curSong = random.choice(songList)
-    while curSong in playedSongs:
+    while curSong in playedFiles:
         curSong = random.choice(songList)
-    playedSongs.append(curSong)
+    playedFiles.append(curSong)
     
-    print(f"Current song file: {curSong}")
+    print(f"Current audio file: {curSong}")
     player.load_file(musicPath + curSong)
     total_time = time.strftime('%H:%M:%S', time.gmtime(player.duration))
     player.play()
@@ -117,6 +95,32 @@ while True:
         curSongTime = time.strftime('%H:%M:%S', time.gmtime(player.curr_pos))
         print(f"\033[K[{curSongTime}/{total_time}]", end="\r", flush=True)
     
+    return playedFiles, totalFilesPlayed, curFilePath
+
+
+print("=| SimpleRadioScheduler by Mr_McTech/McTechDev AKA YourFurryDeveloper on GitHub :3 |=")
+
+print("\nCONFIGURATION")
+print("================================================")
+for setting in range(len(config)):
+    curSetting = list(config)[setting]
+    print(f"{list(config)[setting]}: {config[curSetting]}")
+print("================================================\n")
+print("Config loaded and updated. Config can be updated during playback, and will take effect once the next audio starts.\nStarting song rotation.\n")
+
+print("================================================\n")
+
+time.sleep(2)
+
+while True:
+    updateConfig()
+    
+    if numPlayedSongs == songsBeforeInterval:
+        playedIntervals, totalIntervalsPlayed, curIntervalPath = playRandomFile(intervalsPath, totalIntervalsPlayed, playedIntervals, curIntervalPath)
+        numPlayedSongs = 0
+        time.sleep(pauseTimeSecs)
+    
+    playedSongs, totalSongsPlayed, curMusicPath = playRandomFile(musicPaths, totalSongsPlayed, playedSongs, curMusicPath)
+    
     numPlayedSongs += 1
-    totalSongsPlayed += 1
     time.sleep(pauseTimeSecs)

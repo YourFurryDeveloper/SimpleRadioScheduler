@@ -27,7 +27,7 @@ Example:
 ```
 <br>
 
-To specify the path of your interval signal audio files, put it in the `intervalSignals` object. **ALWAYS PUT A SLASH (/) AFTER A FILE PATH!** If there is more than one file, the program will randomly select a file to play.
+To specify the path of your interval signal audio files, put it in the `intervalSignals` object. You can schedule interval signals for different times the same way you schedule different song categories or programs. **ALWAYS PUT A SLASH (/) AFTER A FILE PATH!** If there is more than one file in the folder, the program will randomly select a file to play.
 <br>
 To specify the amount of songs that are played before your station's interval signal is played, set the `defaultSongGrouping` object.
 

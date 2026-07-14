@@ -1,6 +1,6 @@
 {
     "musicPaths": {},
-    "intervalSignals": "interval_signals/",
+    "intervalSignals": {},
     "defaultSongGrouping": 4,
     "pauseTimeSecs": 3
 }
